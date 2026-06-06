@@ -56,12 +56,12 @@ export const productService = {
     await productService.getById(id);
 
     return productRepository.update(id, {
-      ...(input.name ? { name: input.name } : {}),
-      ...(input.slug ? { slug: toSlug(input.slug) } : {}),
-      ...(input.description ? { description: input.description } : {}),
-      ...(input.category ? { category: input.category } : {}),
+      ...(input.name !== undefined ? { name: input.name } : {}),
+      ...(input.slug !== undefined ? { slug: toSlug(input.slug!) } : {}),
+      ...(input.description !== undefined ? { description: input.description } : {}),
+      ...(input.category !== undefined ? { category: input.category } : {}),
       ...(input.imageUrl !== undefined ? { imageUrl: input.imageUrl } : {}),
-      ...(input.status ? { status: input.status } : {}),
+      ...(input.status !== undefined ? { status: input.status } : {}),
     });
   },
 
