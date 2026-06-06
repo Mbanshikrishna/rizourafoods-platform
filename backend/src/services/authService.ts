@@ -84,10 +84,22 @@ export const authService = {
     const record = await refreshTokenRepository.findActiveByHash(tokenHash);
 
     if (!record) {
+      // Token reuse detection: if the token exists but is already revoked,
+      // an attacker may have stolen it. Revoke all tokens for the user.
+      const revokedRecord = await refreshTokenRepository.findByHash(tokenHash);
+      if (revokedRecord) {
+        await refreshTokenRepository.revokeAllByUserId(revokedRecord.userId);
+      }
       throw new ApiError(401, "Refresh token is invalid or revoked", "REFRESH_TOKEN_INVALID");
     }
 
-    jwt.verify(refreshToken, env.JWT_REFRESH_SECRET);
+    try {
+      jwt.verify(refreshToken, env.JWT_REFRESH_SECRET);
+    } catch {
+      await refreshTokenRepository.revokeByHash(tokenHash);
+      throw new ApiError(401, "Refresh token is expired", "REFRESH_TOKEN_EXPIRED");
+    }
+
     await refreshTokenRepository.revokeByHash(tokenHash);
 
     return issueTokens({

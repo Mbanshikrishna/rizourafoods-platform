@@ -19,7 +19,13 @@ const envSchema = z.object({
   BCRYPT_SALT_ROUNDS: z.coerce.number().int().min(8).max(15).default(12),
   DEFAULT_ADMIN_NAME: z.string().default("Rizoura Admin"),
   DEFAULT_ADMIN_EMAIL: z.string().email().default("admin@rizourafoods.com"),
-  DEFAULT_ADMIN_PASSWORD: z.string().min(12).default("ChangeMe123!"),
+  DEFAULT_ADMIN_PASSWORD: z
+    .string()
+    .min(16, "DEFAULT_ADMIN_PASSWORD must be at least 16 characters")
+    .regex(/[A-Z]/, "DEFAULT_ADMIN_PASSWORD must contain an uppercase letter")
+    .regex(/[a-z]/, "DEFAULT_ADMIN_PASSWORD must contain a lowercase letter")
+    .regex(/[0-9]/, "DEFAULT_ADMIN_PASSWORD must contain a digit")
+    .regex(/[^A-Za-z0-9]/, "DEFAULT_ADMIN_PASSWORD must contain a special character"),
   AWS_REGION: z.string().default("ap-south-1"),
   SES_FROM_EMAIL: z.string().email().default("no-reply@rizourafoods.com"),
 });

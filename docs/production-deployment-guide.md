@@ -32,12 +32,12 @@ For each environment:
 
 Example for `dev`:
 
-```powershell
-cd C:\Users\mbans\Documents\Rizourafoods\infrastructure\environments\dev
-terraform init `
-  -backend-config="bucket=rizourafoods-terraform-state" `
-  -backend-config="key=dev/terraform.tfstate" `
-  -backend-config="region=ap-south-1" `
+```sh
+cd infrastructure/environments/dev
+terraform init \
+  -backend-config="bucket=rizourafoods-terraform-state" \
+  -backend-config="key=dev/terraform.tfstate" \
+  -backend-config="region=ap-south-1" \
   -backend-config="dynamodb_table=rizourafoods-terraform-locks"
 terraform plan -var-file=terraform.tfvars
 terraform apply -var-file=terraform.tfvars
@@ -69,8 +69,8 @@ EC2 bootstrap logic fetches this secret and writes `/opt/rizourafoods/.env` befo
 
 Sync the frontend build output to the environment S3 bucket, then invalidate the CloudFront distribution:
 
-```powershell
-cd C:\Users\mbans\Documents\Rizourafoods\frontend
+```sh
+cd frontend
 npm install
 npm run build
 aws s3 sync dist s3://<frontend-bucket-name> --delete

@@ -1,3 +1,4 @@
+import FloatingCTA from "../components/FloatingCTA";
 import Footer from "../components/Footer";
 import Navbar from "../components/Navbar";
 
@@ -7,6 +8,7 @@ function SiteLayout({ children }) {
       <Navbar />
       <main>{children}</main>
       <Footer />
+      <FloatingCTA />
     </div>
   );
 }

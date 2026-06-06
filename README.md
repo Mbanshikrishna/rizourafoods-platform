@@ -37,7 +37,7 @@ docs/            Project notes and deployment guidance
 
 ### Frontend
 
-```powershell
+```sh
 cd frontend
 npm install
 npm run dev
@@ -45,9 +45,9 @@ npm run dev
 
 ### Backend
 
-```powershell
+```sh
 cd backend
-Copy-Item .env.example .env
+cp .env.example .env
 npm install
 npm run prisma:generate
 npm run prisma:migrate
@@ -56,16 +56,16 @@ npm run dev
 
 ### Docker Compose
 
-```powershell
+```sh
 cd backend
 docker compose up --build
 ```
 
 ## Deployment
 
-- Backend CI/CD workflow: [.github/workflows/backend.yml](C:\Users\mbans\Documents\Rizourafoods\.github\workflows\backend.yml)
-- Infrastructure workflow: [.github/workflows/infrastructure.yml](C:\Users\mbans\Documents\Rizourafoods\.github\workflows\infrastructure.yml)
-- Production guide: [production-deployment-guide.md](C:\Users\mbans\Documents\Rizourafoods\docs\production-deployment-guide.md)
+- Backend CI/CD workflow: [.github/workflows/backend.yml](.github/workflows/backend.yml)
+- Infrastructure workflow: [.github/workflows/infrastructure.yml](.github/workflows/infrastructure.yml)
+- Production guide: [docs/production-deployment-guide.md](docs/production-deployment-guide.md)
 
 ## Notes
 

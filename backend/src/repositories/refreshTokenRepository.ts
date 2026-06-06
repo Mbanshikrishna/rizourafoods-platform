@@ -20,10 +20,29 @@ export const refreshTokenRepository = {
       },
     }),
 
+  /** Find a token record by hash regardless of revocation status (for reuse detection). */
+  findByHash: (tokenHash: string) =>
+    prisma.refreshToken.findFirst({
+      where: { tokenHash },
+      include: { user: true },
+    }),
+
   revokeByHash: (tokenHash: string) =>
     prisma.refreshToken.updateMany({
       where: {
         tokenHash,
+        revokedAt: null,
+      },
+      data: {
+        revokedAt: new Date(),
+      },
+    }),
+
+  /** Revoke all active tokens for a user (token family invalidation). */
+  revokeAllByUserId: (userId: string) =>
+    prisma.refreshToken.updateMany({
+      where: {
+        userId,
         revokedAt: null,
       },
       data: {

@@ -8,6 +8,7 @@ export const healthController = {
 
   ready: async (_req: Request, res: Response) => {
     const readiness = await healthService.readiness();
-    res.status(200).json(readiness);
+    const statusCode = readiness.status === "ready" ? 200 : 503;
+    res.status(statusCode).json(readiness);
   },
 };

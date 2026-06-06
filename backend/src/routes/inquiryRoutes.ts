@@ -1,13 +1,14 @@
 import { Router } from "express";
 import { inquiryController } from "../controllers/inquiryController";
 import { requireAuth, requireRole } from "../middlewares/auth";
+import { publicFormLimiter } from "../middlewares/rateLimiter";
 import { validateRequest } from "../middlewares/validateRequest";
 import { asyncHandler } from "../utils/asyncHandler";
 import { createInquirySchema, listInquirySchema } from "../validations/inquiryValidation";
 
 const router = Router();
 
-router.post("/", validateRequest(createInquirySchema), asyncHandler(inquiryController.create));
+router.post("/", publicFormLimiter, validateRequest(createInquirySchema), asyncHandler(inquiryController.create));
 router.get(
   "/",
   requireAuth,

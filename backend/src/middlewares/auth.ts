@@ -24,14 +24,17 @@ export const requireAuth = (req: Request, _res: Response, next: NextFunction) =>
     return next(new ApiError(401, "Authorization token is required", "AUTH_REQUIRED"));
   }
 
-  const payload = jwt.verify(token, env.JWT_ACCESS_SECRET) as AccessTokenPayload;
-  req.user = {
-    userId: payload.sub,
-    email: payload.email,
-    role: payload.role,
-  };
-
-  next();
+  try {
+    const payload = jwt.verify(token, env.JWT_ACCESS_SECRET) as AccessTokenPayload;
+    req.user = {
+      userId: payload.sub,
+      email: payload.email,
+      role: payload.role,
+    };
+    next();
+  } catch (error) {
+    next(error);
+  }
 };
 
 export const requireRole =

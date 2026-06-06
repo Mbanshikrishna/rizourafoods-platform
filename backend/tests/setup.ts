@@ -13,6 +13,6 @@ process.env.JWT_REFRESH_COOKIE_NAME = "rizoura_refresh_token";
 process.env.BCRYPT_SALT_ROUNDS = "10";
 process.env.DEFAULT_ADMIN_NAME = "Test Admin";
 process.env.DEFAULT_ADMIN_EMAIL = "admin@example.com";
-process.env.DEFAULT_ADMIN_PASSWORD = "ChangeMe123!";
+process.env.DEFAULT_ADMIN_PASSWORD = "TestPassword!2025x";
 process.env.AWS_REGION = "ap-south-1";
 process.env.SES_FROM_EMAIL = "no-reply@example.com";

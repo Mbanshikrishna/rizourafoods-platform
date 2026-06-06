@@ -1,3 +1,4 @@
+import { Prisma } from "@prisma/client";
 import { prisma } from "../prisma/client";
 
 export const healthService = {
@@ -8,12 +9,20 @@ export const healthService = {
   }),
 
   readiness: async () => {
-    await prisma.$queryRawUnsafe("SELECT 1");
+    try {
+      await prisma.$queryRaw(Prisma.sql`SELECT 1`);
 
-    return {
-      status: "ready",
-      timestamp: new Date().toISOString(),
-      database: "ok",
-    };
+      return {
+        status: "ready" as const,
+        timestamp: new Date().toISOString(),
+        database: "ok",
+      };
+    } catch {
+      return {
+        status: "not_ready" as const,
+        timestamp: new Date().toISOString(),
+        database: "error",
+      };
+    }
   },
 };

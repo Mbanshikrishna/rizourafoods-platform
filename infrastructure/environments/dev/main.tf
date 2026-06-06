@@ -175,11 +175,11 @@ resource "aws_secretsmanager_secret" "app_config" {
 resource "aws_secretsmanager_secret_version" "app_config" {
   secret_id = aws_secretsmanager_secret.app_config.id
   secret_string = jsonencode({
-    NODE_ENV                = "production"
+    NODE_ENV                = "development"
     PORT                    = "3000"
     API_PREFIX              = "/api/v1"
     APP_NAME                = "Rizoura Foods API"
-    LOG_LEVEL               = "info"
+    LOG_LEVEL               = "debug"
     FRONTEND_ORIGIN         = "https://${var.root_domain_name}"
     DATABASE_URL            = "postgresql://${var.db_username}:${random_password.db_password.result}@${module.rds.address}:${module.rds.port}/${module.rds.db_name}"
     JWT_ACCESS_SECRET       = random_password.jwt_access.result
