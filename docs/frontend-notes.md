@@ -1,6 +1,6 @@
 # Rizoura Foods Frontend Notes
 
-This first pass focuses on a premium landing page experience before backend APIs, CMS setup, or Terraform.
+This first pass focuses on a premium landing page experience before backend APIs or CMS setup.
 
 ## Current Scope
 

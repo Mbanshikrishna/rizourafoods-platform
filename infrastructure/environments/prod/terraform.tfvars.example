@@ -1,8 +1,0 @@
-zone_name                = "rizourafoods.com"
-root_domain_name         = "rizourafoods.com"
-api_certificate_arn      = "arn:aws:acm:ap-south-1:123456789012:certificate/replace-me"
-frontend_certificate_arn = "arn:aws:acm:us-east-1:123456789012:certificate/replace-me"
-key_name                 = "rizourafoods-prod"
-default_admin_email      = "admin@rizourafoods.com"
-default_admin_password   = "REPLACE-WITH-STRONG-PASSWORD"
-ses_from_email           = "no-reply@rizourafoods.com"
