@@ -9,7 +9,7 @@ const envSchema = z.object({
   API_PREFIX: z.string().default("/api/v1"),
   APP_NAME: z.string().default("Rizoura Foods API"),
   LOG_LEVEL: z.string().default("info"),
-  FRONTEND_ORIGIN: z.string().url().default("http://localhost:5173"),
+  FRONTEND_ORIGIN: z.string().min(1).default("http://localhost:5173"),
   DATABASE_URL: z.string().min(1, "DATABASE_URL is required"),
   JWT_ACCESS_SECRET: z.string().min(16, "JWT_ACCESS_SECRET must be at least 16 characters"),
   JWT_REFRESH_SECRET: z.string().min(16, "JWT_REFRESH_SECRET must be at least 16 characters"),

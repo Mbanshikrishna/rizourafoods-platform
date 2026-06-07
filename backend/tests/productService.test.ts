@@ -27,10 +27,12 @@ describe("productService.update", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     vi.mocked(productRepository.findById).mockResolvedValue(mockProduct);
-    vi.mocked(productRepository.update).mockImplementation(async (_id, data) => ({
-      ...mockProduct,
-      ...data,
-    }) as never);
+    vi.mocked(productRepository.update).mockImplementation(
+      ((_id: string, data: Record<string, unknown>) => Promise.resolve({
+        ...mockProduct,
+        ...data,
+      })) as typeof productRepository.update,
+    );
   });
 
   it("includes name in update payload when provided", async () => {
