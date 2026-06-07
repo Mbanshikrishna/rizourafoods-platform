@@ -3,8 +3,11 @@ const FORMULA_PREFIXES = new Set(["=", "+", "-", "@", "\t", "\r"]);
 const sanitizeCell = (value: unknown): string => {
   const str = value == null ? "" : String(value);
 
-  // Neutralize CSV injection: prefix dangerous values with a single quote
-  if (str.length > 0 && FORMULA_PREFIXES.has(str[0])) {
+  // Neutralize CSV injection: prefix dangerous values with a single quote.
+  // Strip leading spaces (but not tabs/CR which are themselves dangerous prefixes)
+  // so that " =CMD()" is also caught.
+  const stripped = str.replace(/^ +/, "");
+  if (stripped.length > 0 && FORMULA_PREFIXES.has(stripped[0])) {
     return `'${str}`;
   }
 

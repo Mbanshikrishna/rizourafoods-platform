@@ -63,11 +63,11 @@ export const blogService = {
     await blogService.getById(id);
 
     return blogRepository.update(id, {
-      ...(input.title ? { title: input.title } : {}),
-      ...(input.slug ? { slug: toSlug(input.slug) } : {}),
-      ...(input.content ? { content: input.content } : {}),
+      ...(input.title !== undefined ? { title: input.title } : {}),
+      ...(input.slug !== undefined ? { slug: toSlug(input.slug!) } : {}),
+      ...(input.content !== undefined ? { content: input.content } : {}),
       ...(input.featuredImage !== undefined ? { featuredImage: input.featuredImage } : {}),
-      ...(input.status ? { status: input.status } : {}),
+      ...(input.status !== undefined ? { status: input.status } : {}),
     });
   },
 
