@@ -8,7 +8,7 @@ export const blogController = {
   },
 
   getBySlug: async (req: Request, res: Response) => {
-    const result = await blogService.getBySlug(req.params.slug);
+    const result = await blogService.getBySlug(req.params.slug as string);
     res.status(200).json({ data: result });
   },
 
@@ -18,12 +18,12 @@ export const blogController = {
   },
 
   update: async (req: Request, res: Response) => {
-    const result = await blogService.update(req.params.id, req.body);
+    const result = await blogService.update(req.params.id as string, req.body);
     res.status(200).json({ data: result });
   },
 
   delete: async (req: Request, res: Response) => {
-    await blogService.delete(req.params.id);
+    await blogService.delete(req.params.id as string);
     res.status(204).send();
   },
 };

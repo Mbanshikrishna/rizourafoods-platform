@@ -23,17 +23,17 @@ const hashToken = (token: string) => crypto.createHash("sha256").update(token).d
 
 const signAccessToken = (payload: AccessPayload) =>
   jwt.sign(payload, env.JWT_ACCESS_SECRET, {
-    expiresIn: env.JWT_ACCESS_TTL,
+    expiresIn: env.JWT_ACCESS_TTL as ms.StringValue,
   });
 
 const signRefreshToken = (payload: AccessPayload) =>
   jwt.sign(payload, env.JWT_REFRESH_SECRET, {
-    expiresIn: env.JWT_REFRESH_TTL,
+    expiresIn: env.JWT_REFRESH_TTL as ms.StringValue,
   });
 
 const persistRefreshToken = async (userId: string, refreshToken: string) => {
   const tokenHash = hashToken(refreshToken);
-  const ttlMs = ms(env.JWT_REFRESH_TTL);
+  const ttlMs = ms(env.JWT_REFRESH_TTL as ms.StringValue);
 
   if (typeof ttlMs !== "number") {
     throw new ApiError(500, "Invalid refresh token TTL configuration", "AUTH_CONFIG_INVALID");

@@ -25,10 +25,12 @@ describe("blogService.update", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     vi.mocked(blogRepository.findById).mockResolvedValue(mockBlog);
-    vi.mocked(blogRepository.update).mockImplementation(async (_id, data) => ({
-      ...mockBlog,
-      ...data,
-    }) as never);
+    vi.mocked(blogRepository.update).mockImplementation(
+      ((_id: string, data: Record<string, unknown>) => Promise.resolve({
+        ...mockBlog,
+        ...data,
+      })) as typeof blogRepository.update,
+    );
   });
 
   it("includes title in update payload when provided", async () => {

@@ -13,11 +13,12 @@ export const inquiryController = {
   },
 
   exportCsv: async (req: Request, res: Response) => {
+    const query = req.query as Record<string, unknown>;
     const csv = await inquiryService.exportCsv({
-      ...(req.query as never),
+      ...query,
       page: 1,
       pageSize: 10000,
-    });
+    } as never);
 
     res.setHeader("Content-Type", "text/csv");
     res.setHeader(

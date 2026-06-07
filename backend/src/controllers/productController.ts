@@ -8,7 +8,7 @@ export const productController = {
   },
 
   getById: async (req: Request, res: Response) => {
-    const result = await productService.getById(req.params.id);
+    const result = await productService.getById(req.params.id as string);
     res.status(200).json({ data: result });
   },
 
@@ -18,12 +18,12 @@ export const productController = {
   },
 
   update: async (req: Request, res: Response) => {
-    const result = await productService.update(req.params.id, req.body);
+    const result = await productService.update(req.params.id as string, req.body);
     res.status(200).json({ data: result });
   },
 
   delete: async (req: Request, res: Response) => {
-    await productService.delete(req.params.id);
+    await productService.delete(req.params.id as string);
     res.status(204).send();
   },
 };
