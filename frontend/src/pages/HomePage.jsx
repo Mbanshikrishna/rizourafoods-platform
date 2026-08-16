@@ -1,26 +1,3 @@
-import AboutSection from "../components/AboutSection";
-import ContactSection from "../components/ContactSection";
-import CookingSection from "../components/CookingSection";
-import ExportSection from "../components/ExportSection";
-import HeroSection from "../components/HeroSection";
-import ProductSection from "../components/ProductSection";
-import QualitySection from "../components/QualitySection";
-import RecipesSection from "../components/RecipesSection";
-import SiteLayout from "../layouts/SiteLayout";
-
-function HomePage() {
-  return (
-    <SiteLayout>
-      <HeroSection />
-      <AboutSection />
-      <ProductSection />
-      <QualitySection />
-      <CookingSection />
-      <RecipesSection />
-      <ExportSection />
-      <ContactSection />
-    </SiteLayout>
-  );
-}
-
-export default HomePage;
+import { Link } from "react-router-dom";
+const categories = [["Rice", "Basmati, sella and everyday rice for kitchens, wholesale and export enquiries.", "/rice"], ["Spices", "Freshly processed spice products, subject to catalogue availability.", "/spices"], ["Masalas", "Indian and regional masala products for food businesses.", "/masalas"]];
+export default function HomePage() { return <><section className="relative overflow-hidden bg-brand-forest py-20 text-brand-sand sm:py-28"><div className="absolute -right-32 top-0 h-96 w-96 rounded-full bg-brand-gold/10 blur-3xl" /><div className="section-shell relative grid gap-12 lg:grid-cols-[1.2fr_.8fr] lg:items-center"><div><p className="eyebrow">Rizoura Foods · B2B supply</p><h1 className="mt-6 max-w-3xl font-display text-5xl leading-[.95] sm:text-7xl">Authentic ingredients. <span className="text-brand-gold">Trusted quality.</span></h1><p className="mt-7 max-w-2xl text-lg leading-8 text-brand-sand/75">Premium rice, freshly processed spices and authentic Indian masalas for homes, restaurants, retailers and global buyers.</p><div className="mt-9 flex flex-col gap-3 sm:flex-row"><Link to="/products" className="rounded-full bg-brand-gold px-7 py-4 text-center font-bold text-brand-forest">Explore products</Link><Link to="/request-quote" className="rounded-full border border-brand-gold/50 px-7 py-4 text-center font-bold">Request B2B quote</Link></div></div><div className="rounded-[2.5rem] border border-brand-gold/20 bg-brand-dark/50 p-8"><p className="text-xs font-bold uppercase tracking-[.22em] text-brand-gold">Commercial supply</p><h2 className="mt-4 font-display text-3xl">From product discovery to a tailored commercial quote.</h2><ol className="mt-6 space-y-3 text-sm leading-6 text-brand-sand/70"><li>01 · Browse the published catalogue</li><li>02 · Add requirements to your enquiry cart</li><li>03 · Share quantity, pack and delivery needs</li><li>04 · Confirm pricing and supply with our team</li></ol></div></div></section><section className="section-shell py-16 sm:py-24"><p className="eyebrow">Product categories</p><h2 className="mt-4 font-display text-4xl">A growing food portfolio for business buyers.</h2><div className="mt-10 grid gap-5 md:grid-cols-3">{categories.map(([name, description, to]) => <Link key={name} to={to} className="premium-card group p-7"><p className="text-xs font-bold uppercase tracking-widest text-brand-gold">Rizoura range</p><h3 className="mt-3 font-display text-3xl">{name}</h3><p className="mt-3 leading-7 text-brand-emerald/70">{description}</p><span className="mt-6 inline-block text-sm font-bold underline">Browse {name.toLowerCase()}</span></Link>)}</div></section><section className="bg-brand-cream/60 py-16"><div className="section-shell grid gap-8 lg:grid-cols-3"><div><p className="eyebrow">Why Rizoura</p><h2 className="mt-4 font-display text-4xl">Commercially focused, thoughtfully presented.</h2></div>{[["Product-led enquiries", "Tell us the product, quantity and pack size you need."], ["B2B conversations", "Use a dedicated commercial quote cart rather than a retail checkout."], ["Built on food-processing experience", "Rizoura is developing its product portfolio around existing family-owned mill access, without unverified capacity claims."]].map(([title, copy]) => <div key={title} className="rounded-2xl bg-white p-6"><h3 className="font-display text-2xl">{title}</h3><p className="mt-3 text-sm leading-7 text-brand-emerald/70">{copy}</p></div>)}</div></section><section className="section-shell py-16 sm:py-24"><div className="rounded-[2rem] bg-brand-dark p-8 text-brand-sand sm:p-12"><p className="eyebrow">Distribution & export</p><h2 className="mt-4 max-w-2xl font-display text-4xl">Start the right supply conversation.</h2><p className="mt-4 max-w-xl leading-7 text-brand-sand/70">Discuss distributor opportunities, private label, bulk supply or an export requirement without relying on unverified claims or assumed availability.</p><div className="mt-7 flex flex-wrap gap-3"><Link to="/distributor" className="rounded-full bg-brand-gold px-5 py-3 font-bold text-brand-forest">Become a distributor</Link><Link to="/export" className="rounded-full border border-brand-gold/40 px-5 py-3 font-bold">Export enquiry</Link></div></div></section></>; }

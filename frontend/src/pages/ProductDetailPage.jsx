@@ -1,0 +1,12 @@
+import { useEffect, useState } from "react";
+import { Link, useParams } from "react-router-dom";
+import { getProduct } from "../api/products";
+import { useCart } from "../context/CartContext";
+
+export default function ProductDetailPage() {
+  const { id } = useParams(); const [product, setProduct] = useState(null); const [state, setState] = useState("loading"); const { add } = useCart();
+  useEffect(() => { getProduct(id).then((value) => { setProduct(value); setState("ready"); document.title = `${value.name} | Rizoura Foods`; }).catch(() => setState("error")); }, [id]);
+  if (state === "loading") return <div className="section-shell py-20">Loading product…</div>;
+  if (state === "error") return <div className="section-shell py-20"><h1 className="font-display text-4xl">Product unavailable</h1><p className="mt-4 text-brand-emerald/70">This product is no longer published or could not be found.</p><Link to="/products" className="mt-6 inline-block rounded-full bg-brand-forest px-5 py-3 text-brand-sand">Back to catalogue</Link></div>;
+  return <section className="section-shell grid gap-10 py-14 lg:grid-cols-2 lg:py-20"><div className="flex min-h-80 items-center justify-center rounded-[2rem] bg-brand-forest p-8 font-display text-center text-4xl text-brand-gold">{product.imageUrl ? <img src={product.imageUrl} alt={product.name} className="max-h-[28rem] w-full object-contain" /> : product.name}</div><div><p className="eyebrow">{product.category}</p><h1 className="mt-4 font-display text-4xl sm:text-5xl">{product.name}</h1><p className="mt-6 leading-8 text-brand-emerald/75">{product.description}</p><dl className="mt-8 grid grid-cols-2 gap-4 border-y border-brand-gold/20 py-6 text-sm"><div><dt className="font-bold text-brand-emerald/60">B2B availability</dt><dd className="mt-1">Request confirmation</dd></div><div><dt className="font-bold text-brand-emerald/60">Pack sizes & MOQ</dt><dd className="mt-1">Shared with your quote</dd></div></dl><p className="mt-6 text-sm leading-6 text-brand-emerald/65">Processing, ingredient, origin and laboratory details are provided only when supplied for this product.</p><div className="mt-8 flex flex-col gap-3 sm:flex-row"><button onClick={() => add(product)} className="rounded-full bg-brand-gold px-6 py-3 font-bold text-brand-forest">Add to commercial enquiry</button><Link to={`/request-sample?product=${encodeURIComponent(product.name)}`} className="rounded-full border border-brand-forest px-6 py-3 text-center font-bold">Request sample</Link></div></div></section>;
+}

@@ -2,8 +2,8 @@ import type { Request, Response } from "express";
 import { productService } from "../services/productService";
 
 export const productController = {
-  list: async (req: Request, res: Response) => {
-    const result = await productService.list(req.query as never);
+  list: async (_req: Request, res: Response) => {
+    const result = await productService.list(res.locals.validatedQuery as never);
     res.status(200).json(result);
   },
 
