@@ -12,6 +12,7 @@ declare global {
       id?: string;
       user?: UserContext;
       requestId?: string;
+      customer?: { customerId: string; email: string; status: import("@prisma/client").CustomerStatus };
     }
   }
 }

@@ -3,12 +3,16 @@ import { productService } from "../services/productService";
 
 export const productController = {
   list: async (_req: Request, res: Response) => {
-    const result = await productService.list(res.locals.validatedQuery as never);
+    const result = await productService.list({ ...res.locals.validatedQuery, status: "PUBLISHED" } as never);
     res.status(200).json(result);
   },
 
   getById: async (req: Request, res: Response) => {
-    const result = await productService.getById(req.params.id as string);
+    const result = await productService.getPublishedById(req.params.id as string);
+    res.status(200).json({ data: result });
+  },
+  getBySlug: async (req: Request, res: Response) => {
+    const result = await productService.getBySlug(req.params.slug as string);
     res.status(200).json({ data: result });
   },
 

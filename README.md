@@ -31,6 +31,14 @@ npm install
 npm run dev
 ```
 
+The backend development seed creates a small, clearly marked development catalogue without prices, inventory, certification or quality claims. Run `npm run prisma:seed` after migrating when catalogue records are needed locally.
+
+### B2B platform
+
+Customer accounts begin in `PENDING` status and require manual business approval before customer-tier pricing can be served. Quotes and sample requests support authenticated customers and guest contacts; orders can only be created from accepted, server-priced quotes. See [B2B architecture](docs/b2b-architecture.md).
+
+For Docker deployments PostgreSQL is not publicly exposed. The compose definition binds it only to loopback for local tooling; the API container connects over the internal `db` service network.
+
 ### Backend
 
 ```sh
@@ -176,13 +184,14 @@ PORT=3000
 API_PREFIX=/api/v1
 APP_NAME=Rizoura Foods API
 LOG_LEVEL=info
-FRONTEND_ORIGIN=*
+FRONTEND_ORIGIN=https://your-frontend-domain.example
 DATABASE_URL=postgresql://rizoura:CHANGE_THIS_DB_PASSWORD@db:5432/rizourafoods
 JWT_ACCESS_SECRET=CHANGE_THIS_TO_RANDOM_48_CHARS_access
 JWT_REFRESH_SECRET=CHANGE_THIS_TO_RANDOM_48_CHARS_refresh
 JWT_ACCESS_TTL=15m
 JWT_REFRESH_TTL=7d
 JWT_REFRESH_COOKIE_NAME=rizoura_refresh_token
+CUSTOMER_REFRESH_COOKIE_NAME=rizoura_customer_refresh_token
 BCRYPT_SALT_ROUNDS=12
 DEFAULT_ADMIN_NAME=Rizoura Admin
 DEFAULT_ADMIN_EMAIL=admin@rizourafoods.com
@@ -198,7 +207,7 @@ EOF
 Start the services:
 
 ```sh
-docker-compose up -d --build
+docker compose up -d --build
 ```
 
 Wait ~60 seconds for the first build, then verify:
@@ -218,7 +227,7 @@ aws s3 mb s3://rizourafoods-frontend --region ap-south-1
 
 # Build frontend with your EC2 IP
 cd frontend
-VITE_API_URL=http://<YOUR_EIP>:3000/api/v1 npm run build
+VITE_API_URL=https://api.your-domain.example/api/v1 npm run build
 
 # Upload
 aws s3 sync dist/ s3://rizourafoods-frontend --delete
@@ -263,7 +272,7 @@ ssh -i rizoura-key.pem ec2-user@$EIP
 cd rizourafoods-platform
 git pull
 cd backend
-docker-compose up -d --build
+docker compose up -d --build
 ```
 
 ### Updating the frontend

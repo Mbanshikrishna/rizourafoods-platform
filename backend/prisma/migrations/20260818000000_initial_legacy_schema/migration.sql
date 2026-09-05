@@ -1,0 +1,23 @@
+-- Baseline for installations created before Prisma migration history existed.
+CREATE SCHEMA IF NOT EXISTS "public";
+CREATE TYPE "ProductStatus" AS ENUM ('DRAFT', 'PUBLISHED', 'ARCHIVED');
+CREATE TYPE "BlogStatus" AS ENUM ('DRAFT', 'PUBLISHED', 'ARCHIVED');
+CREATE TYPE "UserRole" AS ENUM ('ADMIN', 'EDITOR', 'VIEWER', 'DISTRIBUTOR');
+CREATE TYPE "InquiryType" AS ENUM ('EXPORT', 'BULK_ORDER', 'CONTACT', 'DISTRIBUTOR', 'PRIVATE_LABEL', 'GENERAL');
+CREATE TABLE "Product" ("id" TEXT NOT NULL, "name" TEXT NOT NULL, "slug" TEXT NOT NULL, "description" TEXT NOT NULL, "category" TEXT NOT NULL, "imageUrl" TEXT, "status" "ProductStatus" NOT NULL DEFAULT 'DRAFT', "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP, "updatedAt" TIMESTAMP(3) NOT NULL, CONSTRAINT "Product_pkey" PRIMARY KEY ("id"));
+CREATE TABLE "Inquiry" ("id" TEXT NOT NULL, "name" TEXT NOT NULL, "email" TEXT NOT NULL, "company" TEXT, "country" TEXT, "phone" TEXT, "inquiryType" "InquiryType" NOT NULL DEFAULT 'GENERAL', "message" TEXT NOT NULL, "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP, CONSTRAINT "Inquiry_pkey" PRIMARY KEY ("id"));
+CREATE TABLE "Blog" ("id" TEXT NOT NULL, "title" TEXT NOT NULL, "slug" TEXT NOT NULL, "content" TEXT NOT NULL, "featuredImage" TEXT, "status" "BlogStatus" NOT NULL DEFAULT 'DRAFT', "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP, "updatedAt" TIMESTAMP(3) NOT NULL, CONSTRAINT "Blog_pkey" PRIMARY KEY ("id"));
+CREATE TABLE "AdminUser" ("id" TEXT NOT NULL, "name" TEXT NOT NULL, "email" TEXT NOT NULL, "passwordHash" TEXT NOT NULL, "role" "UserRole" NOT NULL DEFAULT 'EDITOR', "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP, "updatedAt" TIMESTAMP(3) NOT NULL, CONSTRAINT "AdminUser_pkey" PRIMARY KEY ("id"));
+CREATE TABLE "RefreshToken" ("id" TEXT NOT NULL, "tokenHash" TEXT NOT NULL, "expiresAt" TIMESTAMP(3) NOT NULL, "revokedAt" TIMESTAMP(3), "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP, "userId" TEXT NOT NULL, CONSTRAINT "RefreshToken_pkey" PRIMARY KEY ("id"));
+CREATE UNIQUE INDEX "Product_slug_key" ON "Product"("slug");
+CREATE INDEX "Product_category_status_idx" ON "Product"("category", "status");
+CREATE INDEX "Product_createdAt_idx" ON "Product"("createdAt");
+CREATE INDEX "Inquiry_inquiryType_createdAt_idx" ON "Inquiry"("inquiryType", "createdAt");
+CREATE INDEX "Inquiry_email_idx" ON "Inquiry"("email");
+CREATE UNIQUE INDEX "Blog_slug_key" ON "Blog"("slug");
+CREATE INDEX "Blog_status_createdAt_idx" ON "Blog"("status", "createdAt");
+CREATE UNIQUE INDEX "AdminUser_email_key" ON "AdminUser"("email");
+CREATE INDEX "AdminUser_role_idx" ON "AdminUser"("role");
+CREATE UNIQUE INDEX "RefreshToken_tokenHash_key" ON "RefreshToken"("tokenHash");
+CREATE INDEX "RefreshToken_userId_expiresAt_idx" ON "RefreshToken"("userId", "expiresAt");
+ALTER TABLE "RefreshToken" ADD CONSTRAINT "RefreshToken_userId_fkey" FOREIGN KEY ("userId") REFERENCES "AdminUser"("id") ON DELETE CASCADE ON UPDATE CASCADE;

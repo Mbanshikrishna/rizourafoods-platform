@@ -23,6 +23,10 @@ enum UserRole {
   ADMIN
   EDITOR
   VIEWER
+  SALES
+  PROCUREMENT
+  WAREHOUSE
+  FINANCE
   DISTRIBUTOR
 }
 
@@ -35,19 +39,301 @@ enum InquiryType {
   GENERAL
 }
 
+enum CustomerStatus {
+  PENDING
+  ACTIVE
+  SUSPENDED
+  REJECTED
+}
+enum BusinessProfileStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+enum QuoteStatus {
+  DRAFT
+  SUBMITTED
+  UNDER_REVIEW
+  QUOTED
+  ACCEPTED
+  REJECTED
+  EXPIRED
+  CANCELLED
+}
+enum SampleStatus {
+  REQUESTED
+  UNDER_REVIEW
+  APPROVED
+  DISPATCHED
+  DELIVERED
+  REJECTED
+  CANCELLED
+}
+enum OrderStatus {
+  PENDING
+  CONFIRMED
+  PROCESSING
+  DISPATCHED
+  DELIVERED
+  CANCELLED
+}
+enum DistributorApplicationStatus {
+  SUBMITTED
+  UNDER_REVIEW
+  APPROVED
+  REJECTED
+}
+enum PriceTier {
+  RETAIL
+  B2B
+  DISTRIBUTOR
+  EXPORT
+}
+
 model Product {
   id          String        @id @default(cuid())
   name        String
   slug        String        @unique
   description String        @db.Text
+  shortDescription String?
   category    String
+  subcategory String?
   imageUrl    String?
+  origin String?
+  ingredients String?
+  unit String?
+  packSizes String[] @default([])
+  moq Decimal? @db.Decimal(12, 2)
+  availability String?
+  leadTimeDays Int?
+  b2bEligible Boolean @default(true)
+  badges String[] @default([])
+  specifications String? @db.Text
+  storageInstructions String? @db.Text
+  usage String? @db.Text
+  quoteLines QuoteLine[]
+  sampleLines SampleRequestLine[]
+  prices ProductPrice[]
   status      ProductStatus @default(DRAFT)
   createdAt   DateTime      @default(now())
   updatedAt   DateTime      @updatedAt
 
   @@index([category, status])
   @@index([createdAt])
+}
+
+model Customer {
+  id String @id @default(cuid())
+  name String
+  email String @unique
+  phone String?
+  passwordHash String
+  status CustomerStatus @default(PENDING)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  businessProfile BusinessProfile?
+  addresses Address[]
+  refreshTokens CustomerRefreshToken[]
+  quotes Quote[]
+  samples SampleRequest[]
+  orders Order[]
+  @@index([status])
+}
+
+model BusinessProfile {
+  id String @id @default(cuid())
+  customerId String @unique
+  customer Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  businessName String
+  businessType String
+  gstNumber String? @unique
+  panNumber String?
+  address String?
+  city String
+  state String
+  pincode String
+  country String @default("India")
+  estimatedMonthlyVolume String?
+  status BusinessProfileStatus @default(PENDING)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  @@index([businessType, status])
+}
+
+model Address {
+  id String @id @default(cuid())
+  customerId String
+  customer Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  label String?
+  line1 String
+  line2 String?
+  city String
+  state String
+  pincode String
+  country String @default("India")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  @@index([customerId])
+}
+
+model CustomerRefreshToken {
+  id String @id @default(cuid())
+  tokenHash String @unique
+  customerId String
+  customer Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  expiresAt DateTime
+  revokedAt DateTime?
+  createdAt DateTime @default(now())
+  @@index([customerId, expiresAt])
+}
+
+model Quote {
+  id String @id @default(cuid())
+  quoteNumber String @unique
+  customerId String?
+  customer Customer? @relation(fields: [customerId], references: [id], onDelete: SetNull)
+  contactName String
+  company String?
+  email String
+  phone String?
+  deliveryAddress String?
+  status QuoteStatus @default(SUBMITTED)
+  notes String? @db.Text
+  validUntil DateTime?
+  lines QuoteLine[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  @@index([customerId, status])
+}
+
+model QuoteLine {
+  id String @id @default(cuid())
+  quoteId String
+  quote Quote @relation(fields: [quoteId], references: [id], onDelete: Cascade)
+  productId String
+  product Product @relation(fields: [productId], references: [id])
+  quantity Decimal @db.Decimal(12, 2)
+  unit String
+  packSize String?
+  requestedPrice Decimal? @db.Decimal(12, 2)
+  quotedPrice Decimal? @db.Decimal(12, 2)
+  notes String? @db.Text
+}
+
+model SampleRequest {
+  id String @id @default(cuid())
+  customerId String?
+  customer Customer? @relation(fields: [customerId], references: [id], onDelete: SetNull)
+  contactName String
+  company String?
+  email String
+  phone String?
+  businessType String?
+  expectedMonthlyVolume String?
+  intendedUse String?
+  deliveryAddress String?
+  status SampleStatus @default(REQUESTED)
+  lines SampleRequestLine[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  @@index([customerId, status])
+}
+
+model SampleRequestLine {
+  id String @id @default(cuid())
+  sampleRequestId String
+  sampleRequest SampleRequest @relation(fields: [sampleRequestId], references: [id], onDelete: Cascade)
+  productId String
+  product Product @relation(fields: [productId], references: [id])
+  requestedQuantity Decimal @db.Decimal(12, 2)
+  unit String
+}
+
+model ProductPrice {
+  id String @id @default(cuid())
+  productId String
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  tier PriceTier
+  minQuantity Decimal @db.Decimal(12, 2)
+  maxQuantity Decimal? @db.Decimal(12, 2)
+  unit String
+  unitPrice Decimal @db.Decimal(12, 2)
+  currency String @default("INR")
+  validFrom DateTime @default(now())
+  validUntil DateTime?
+  @@index([productId, tier])
+}
+
+model Order {
+  id String @id @default(cuid())
+  orderNumber String @unique
+  customerId String
+  customer Customer @relation(fields: [customerId], references: [id], onDelete: Restrict)
+  status OrderStatus @default(PENDING)
+  subtotal Decimal @db.Decimal(12, 2)
+  tax Decimal @db.Decimal(12, 2) @default(0)
+  shipping Decimal @db.Decimal(12, 2) @default(0)
+  total Decimal @db.Decimal(12, 2)
+  currency String @default("INR")
+  billingAddress String?
+  shippingAddress String?
+  notes String? @db.Text
+  lines OrderLine[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  @@index([customerId, status])
+}
+
+model OrderLine {
+  id String @id @default(cuid())
+  orderId String
+  order Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  productId String
+  productName String
+  quantity Decimal @db.Decimal(12, 2)
+  unit String
+  packSize String?
+  unitPrice Decimal @db.Decimal(12, 2)
+  tax Decimal @db.Decimal(12, 2) @default(0)
+  lineTotal Decimal @db.Decimal(12, 2)
+}
+
+model DistributorApplication {
+  id String @id @default(cuid())
+  name String
+  company String
+  email String
+  phone String
+  gstNumber String?
+  territory String
+  city String
+  state String
+  existingBusiness String?
+  distributionNetwork String?
+  estimatedMonthlyVolume String?
+  productsInterested String?
+  message String? @db.Text
+  status DistributorApplicationStatus @default(SUBMITTED)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  @@index([status, createdAt])
+}
+
+model ExportInquiry {
+  id String @id @default(cuid())
+  company String
+  buyerName String
+  email String
+  phone String?
+  country String
+  destination String?
+  products String
+  quantity String
+  packaging String?
+  privateLabel Boolean @default(false)
+  message String? @db.Text
+  createdAt DateTime @default(now())
+  @@index([country, createdAt])
 }
 
 model Inquiry {

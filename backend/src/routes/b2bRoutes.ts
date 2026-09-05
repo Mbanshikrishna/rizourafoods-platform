@@ -1,0 +1,13 @@
+import { Router } from "express";
+import { b2bController } from "../controllers/b2bController";
+import { optionalCustomerAuth, requireCustomer } from "../middlewares/auth";
+import { publicFormLimiter } from "../middlewares/rateLimiter";
+import { asyncHandler } from "../utils/asyncHandler";
+import { validateRequest } from "../middlewares/validateRequest";
+import { distributorSchema, exportSchema, listMineSchema, orderCreateSchema, quoteCreateSchema, recordSchema, sampleCreateSchema } from "../validations/b2bValidation";
+const quotes = Router(); const samples = Router(); const orders = Router(); const distributor = Router(); const exportsRouter = Router();
+quotes.post("/", publicFormLimiter, optionalCustomerAuth, validateRequest(quoteCreateSchema), asyncHandler(b2bController.createQuote)); quotes.get("/", requireCustomer, validateRequest(listMineSchema), asyncHandler(b2bController.listQuotes)); quotes.get("/:id", requireCustomer, validateRequest(recordSchema), asyncHandler(b2bController.getQuote));
+samples.post("/", publicFormLimiter, optionalCustomerAuth, validateRequest(sampleCreateSchema), asyncHandler(b2bController.createSample)); samples.get("/", requireCustomer, validateRequest(listMineSchema), asyncHandler(b2bController.listSamples)); samples.get("/:id", requireCustomer, validateRequest(recordSchema), asyncHandler(b2bController.getSample));
+orders.post("/", requireCustomer, validateRequest(orderCreateSchema), asyncHandler(b2bController.createOrder)); orders.get("/", requireCustomer, validateRequest(listMineSchema), asyncHandler(b2bController.listOrders)); orders.get("/:id", requireCustomer, validateRequest(recordSchema), asyncHandler(b2bController.getOrder)); orders.post("/:id/reorder", requireCustomer, validateRequest(recordSchema), asyncHandler(b2bController.reorder));
+distributor.post("/apply", publicFormLimiter, validateRequest(distributorSchema), asyncHandler(b2bController.distributor)); exportsRouter.post("/", publicFormLimiter, validateRequest(exportSchema), asyncHandler(b2bController.exportInquiry));
+export { quotes, samples, orders, distributor, exportsRouter };

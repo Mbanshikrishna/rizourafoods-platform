@@ -1,0 +1,11 @@
+import { Router } from "express";
+import { customerController } from "../controllers/customerController";
+import { requireCustomer } from "../middlewares/auth";
+import { authLimiter } from "../middlewares/rateLimiter";
+import { asyncHandler } from "../utils/asyncHandler";
+import { validateRequest } from "../middlewares/validateRequest";
+import { addressCreateSchema, addressUpdateSchema, customerLoginSchema, customerRefreshSchema, registerCustomerSchema, updateBusinessSchema, updateCustomerSchema } from "../validations/customerValidation";
+const auth = Router(); const me = Router();
+auth.post("/register", authLimiter, validateRequest(registerCustomerSchema), asyncHandler(customerController.register)); auth.post("/login", authLimiter, validateRequest(customerLoginSchema), asyncHandler(customerController.login)); auth.post("/refresh", authLimiter, validateRequest(customerRefreshSchema), asyncHandler(customerController.refresh)); auth.post("/logout", asyncHandler(customerController.logout));
+me.use(requireCustomer); me.get("/", asyncHandler(customerController.me)); me.patch("/", validateRequest(updateCustomerSchema), asyncHandler(customerController.updateMe)); me.get("/business", asyncHandler(customerController.business)); me.patch("/business", validateRequest(updateBusinessSchema), asyncHandler(customerController.updateBusiness)); me.get("/addresses", asyncHandler(customerController.addresses)); me.post("/addresses", validateRequest(addressCreateSchema), asyncHandler(customerController.addAddress)); me.patch("/addresses/:id", validateRequest(addressUpdateSchema), asyncHandler(customerController.updateAddress)); me.delete("/addresses/:id", asyncHandler(customerController.deleteAddress));
+export { auth as customerAuthRoutes, me as customerMeRoutes };

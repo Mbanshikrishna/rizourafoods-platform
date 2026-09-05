@@ -4,7 +4,7 @@ import cors from "cors";
 import express from "express";
 import helmet from "helmet";
 import swaggerUi from "swagger-ui-express";
-import { env } from "./config/env";
+import { env, frontendOrigins } from "./config/env";
 import { httpLogger } from "./config/logger";
 import { openApiDocument } from "./config/openapi";
 import { attachRequestContext } from "./middlewares/requestContext";
@@ -16,13 +16,14 @@ import routes from "./routes";
 export const app = express();
 
 app.disable("x-powered-by");
+if (env.NODE_ENV === "production") app.set("trust proxy", 1);
 
 app.use(httpLogger);
 app.use(attachRequestContext);
 app.use(helmet());
 app.use(
   cors({
-    origin: env.FRONTEND_ORIGIN.split(",").map((origin) => origin.trim()),
+    origin: frontendOrigins,
     credentials: true,
   }),
 );

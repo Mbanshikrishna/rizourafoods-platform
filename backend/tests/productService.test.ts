@@ -16,6 +16,7 @@ const mockProduct = {
   name: "Heritage Basmati",
   slug: "heritage-basmati",
   description: "Aged for 2+ years",
+  shortDescription: null, subcategory: null, origin: null, ingredients: null, unit: null, packSizes: [], moq: null, availability: null, leadTimeDays: null, b2bEligible: true, badges: [], specifications: null, storageInstructions: null, usage: null,
   category: "basmati",
   imageUrl: null,
   status: "PUBLISHED" as const,
@@ -31,7 +32,7 @@ describe("productService.update", () => {
       ((_id: string, data: Record<string, unknown>) => Promise.resolve({
         ...mockProduct,
         ...data,
-      })) as typeof productRepository.update,
+      })) as unknown as typeof productRepository.update,
     );
   });
 

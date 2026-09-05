@@ -16,6 +16,7 @@ const envSchema = z.object({
   JWT_ACCESS_TTL: z.string().default("15m"),
   JWT_REFRESH_TTL: z.string().default("7d"),
   JWT_REFRESH_COOKIE_NAME: z.string().default("rizoura_refresh_token"),
+  CUSTOMER_REFRESH_COOKIE_NAME: z.string().default("rizoura_customer_refresh_token"),
   BCRYPT_SALT_ROUNDS: z.coerce.number().int().min(8).max(15).default(12),
   DEFAULT_ADMIN_NAME: z.string().default("Rizoura Admin"),
   DEFAULT_ADMIN_EMAIL: z.string().email().default("admin@rizourafoods.com"),
@@ -28,6 +29,10 @@ const envSchema = z.object({
     .regex(/[^A-Za-z0-9]/, "DEFAULT_ADMIN_PASSWORD must contain a special character"),
   AWS_REGION: z.string().default("ap-south-1"),
   SES_FROM_EMAIL: z.string().email().default("no-reply@rizourafoods.com"),
+}).superRefine((value, context) => {
+  if (value.NODE_ENV === "production" && value.FRONTEND_ORIGIN.split(",").some((origin) => origin.trim() === "*")) {
+    context.addIssue({ code: z.ZodIssueCode.custom, path: ["FRONTEND_ORIGIN"], message: "Production FRONTEND_ORIGIN must list explicit HTTPS origins; '*' is not allowed." });
+  }
 });
 
 const parsed = envSchema.safeParse(process.env);
@@ -38,3 +43,4 @@ if (!parsed.success) {
 }
 
 export const env = parsed.data;
+export const frontendOrigins = env.FRONTEND_ORIGIN.split(",").map((origin) => origin.trim()).filter(Boolean);

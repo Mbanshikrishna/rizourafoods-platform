@@ -45,6 +45,10 @@ export const productRepository = {
       where: { id },
     }),
 
+  findPublishedById: (id: string) => prisma.product.findFirst({ where: { id, status: "PUBLISHED" } }),
+
+  findPublishedBySlug: (slug: string) => prisma.product.findFirst({ where: { slug, status: "PUBLISHED" } }),
+
   create: (data: Prisma.ProductCreateInput) =>
     prisma.product.create({
       data,

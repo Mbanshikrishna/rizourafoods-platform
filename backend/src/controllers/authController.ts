@@ -8,14 +8,14 @@ const setRefreshCookie = (res: Response, refreshToken: string) => {
     httpOnly: true,
     sameSite: "strict",
     secure: env.NODE_ENV === "production",
-    path: "/",
+    path: `${env.API_PREFIX}/auth`,
     maxAge: 7 * 24 * 60 * 60 * 1000,
   });
 };
 
 const clearRefreshCookie = (res: Response) => {
   res.clearCookie(env.JWT_REFRESH_COOKIE_NAME, {
-    path: "/",
+    path: `${env.API_PREFIX}/auth`,
   });
 };
 

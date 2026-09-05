@@ -5,4 +5,4 @@ export const listProducts = (filters = {}) => {
   return request(`/products?${query}`).then((response) => response.data);
 };
 
-export const getProduct = (id) => request(`/products/${id}`).then((response) => response.data);
+export const getProduct = (slug) => request(`/products/slug/${encodeURIComponent(slug)}`).then((response) => response.data);

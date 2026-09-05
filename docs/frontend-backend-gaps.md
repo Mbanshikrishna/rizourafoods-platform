@@ -1,10 +1,14 @@
 # Frontend–backend gaps
 
+## Implemented in the B2B foundation
+
+Customer registration/authentication, profile and address APIs, slug product lookup, commercial product fields, quote and sample records, price-tier data model, order/reorder APIs, structured distributor applications and export enquiries are implemented. Customer prices require a manually approved `ACTIVE` account and populated server-side price records. No operational prices are seeded.
+
 The frontend uses the existing published product, inquiry and team-authentication APIs. The following capabilities are required before the platform can provide a customer procurement account rather than an enquiry-led workflow.
 
 | Priority | Feature | Required endpoint | Method | Request / response | Auth | Current backend status | Frontend status |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| P0 | Product detail by slug | `/products/slug/:slug` | GET | Published product with pack sizes, MOQ, origin, ingredients, specifications, quality attributes, images and availability | No | Missing; current API uses internal ID and has basic fields only | Uses ID route; hides unavailable fields |
+| P0 | Product detail by slug | `/products/slug/:slug` | GET | Published product with pack sizes, MOQ, origin, ingredients, specifications, quality attributes, images and availability | No | Implemented | Frontend uses slugs |
 | P0 | Product commercial data | `/products/:id` | GET | `packSizes`, `moq`, `unit`, `badges`, `availability`, optional quality/report links | No | Missing from schema/API | UI identifies these as quote-confirmed |
 | P0 | Business registration | `/customers/register` | POST | Business profile fields; customer ID and pending/active state | No | Missing; `AdminUser` is not a customer model | Registration-interest form creates a real GENERAL inquiry |
 | P0 | Customer authentication | `/customer-auth/register`, `/customer-auth/login`, `/customer-auth/refresh` | POST | Customer session and role | No | Missing; existing `/auth/*` only authenticates `AdminUser` | Team login only; customer login is explicitly unavailable |
