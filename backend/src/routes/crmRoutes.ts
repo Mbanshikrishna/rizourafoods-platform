@@ -24,7 +24,7 @@ router.get("/customers/:id/addresses", canRead, validateRequest(crmCustomerIdSch
 router.post("/customers/:id/addresses", canWrite, validateRequest(crmAddressCreateSchema), asyncHandler(crmController.addAddress));
 router.patch("/customers/:id/addresses/:addressId", canWrite, validateRequest(crmAddressUpdateSchema), asyncHandler(crmController.updateAddress));
 router.delete("/customers/:id/addresses/:addressId", canWrite, validateRequest(crmAddressIdSchema), asyncHandler(crmController.deleteAddress));
-router.get("/customers/:id/activities", canWrite, validateRequest(activityListSchema), asyncHandler(crmController.listActivities));
+router.get("/customers/:id/activities", canRead, validateRequest(activityListSchema), asyncHandler(crmController.listActivities));
 router.post("/customers/:id/activities", canWrite, validateRequest(activityCreateSchema), asyncHandler(crmController.createActivity));
 
 export default router;

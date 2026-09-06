@@ -9,6 +9,11 @@ vi.mock("../src/repositories/customerRepository", () => ({
     findContactForCustomer: vi.fn(),
     createActivity: vi.fn(),
     getCrmCustomer: vi.fn(),
+    getSelf: vi.fn(),
+    getBusinessForCustomer: vi.fn(),
+    updateCustomerStatus: vi.fn(),
+    reviewBusiness: vi.fn(),
+    updateCrmBusiness: vi.fn(),
     listActivities: vi.fn(),
     listCrmCustomers: vi.fn(),
   },
@@ -74,5 +79,30 @@ describe("CRM customer isolation and visibility", () => {
 
     expect(result).toHaveProperty("crmActivities");
     expect(result.businessProfile).toHaveProperty("currentSupplier", "Supplier A");
+  });
+
+  it("records the authenticated CRM user as activity creator, not a request-supplied value", async () => {
+    vi.mocked(customerRepository.findContactForCustomer).mockResolvedValue({ id: "contact-a" } as never);
+    vi.mocked(customerRepository.createActivity).mockResolvedValue({ id: "activity-a" } as never);
+
+    await customerService.createActivity("customer-a", "contact-a", "NOTE", "Follow up", "Call back", "sales-authenticated");
+
+    expect(customerRepository.createActivity).toHaveBeenCalledWith(expect.objectContaining({ createdById: "sales-authenticated" }));
+  });
+
+  it("only permits pending customers to be approved and active customers to be suspended", async () => {
+    vi.mocked(customerRepository.getSelf).mockResolvedValue({ id: "customer-a", status: "PENDING" } as never);
+    vi.mocked(customerRepository.updateCustomerStatus).mockResolvedValue({ id: "customer-a", status: "ACTIVE" } as never);
+    await customerService.approveCustomer("customer-a", "admin-a");
+    expect(customerRepository.updateCustomerStatus).toHaveBeenCalledWith("customer-a", "ACTIVE");
+
+    vi.mocked(customerRepository.getSelf).mockResolvedValue({ id: "customer-a", status: "PENDING" } as never);
+    await expect(customerService.suspendCustomer("customer-a", "admin-a")).rejects.toMatchObject({ code: "CUSTOMER_STATUS_TRANSITION_INVALID" });
+  });
+
+  it("only reviews pending business profiles", async () => {
+    vi.mocked(customerRepository.getBusinessForCustomer).mockResolvedValue({ customerId: "customer-a", status: "APPROVED" } as never);
+
+    await expect(customerService.reviewBusiness("customer-a", "REJECTED", "admin-a")).rejects.toMatchObject({ code: "BUSINESS_STATUS_TRANSITION_INVALID" });
   });
 });

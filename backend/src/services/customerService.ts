@@ -3,6 +3,7 @@ import jwt from "jsonwebtoken";
 import ms from "ms";
 import type { BusinessProfileStatus, BusinessType, ContactRole, CrmActivityType, CustomerStatus, Prisma, UserRole } from "@prisma/client";
 import { env } from "../config/env";
+import { logger } from "../config/logger";
 import { customerRepository } from "../repositories/customerRepository";
 import { ApiError } from "../utils/apiError";
 import { hashPassword, verifyPassword } from "../utils/password";
@@ -82,9 +83,32 @@ export const customerService = {
     const safeBusiness = Object.fromEntries(Object.entries(customer.businessProfile).filter(([key]) => !internalBusinessFields.has(key)));
     return { ...safeCustomer, businessProfile: safeBusiness };
   },
-  updateCrmBusiness: (customerId: string, data: Prisma.BusinessProfileUpdateInput) => customerRepository.updateCrmBusiness(customerId, data),
-  setStatus: (id: string, status: CustomerStatus) => customerRepository.updateCustomerStatus(id, status),
-  reviewBusiness: (id: string, status: BusinessProfileStatus) => customerRepository.reviewBusiness(id, status),
+  async updateCrmBusiness(customerId: string, data: Prisma.BusinessProfileUpdateInput, actorId: string) {
+    const business = await customerRepository.updateCrmBusiness(customerId, data);
+    logger.info({ event: "crm.business_profile_updated", customerId, actorId }, "CRM business profile updated");
+    return business;
+  },
+  async approveCustomer(id: string, actorId: string) {
+    const customer = await customerRepository.getSelf(id);
+    if (customer.status !== "PENDING") throw new ApiError(409, "Only pending customers can be approved", "CUSTOMER_STATUS_TRANSITION_INVALID");
+    const updated = await customerRepository.updateCustomerStatus(id, "ACTIVE");
+    logger.info({ event: "crm.customer_approved", customerId: id, actorId }, "Customer approved");
+    return updated;
+  },
+  async suspendCustomer(id: string, actorId: string) {
+    const customer = await customerRepository.getSelf(id);
+    if (customer.status !== "ACTIVE") throw new ApiError(409, "Only active customers can be suspended", "CUSTOMER_STATUS_TRANSITION_INVALID");
+    const updated = await customerRepository.updateCustomerStatus(id, "SUSPENDED");
+    logger.info({ event: "crm.customer_suspended", customerId: id, actorId }, "Customer suspended");
+    return updated;
+  },
+  async reviewBusiness(id: string, status: BusinessProfileStatus, actorId: string) {
+    const business = await customerRepository.getBusinessForCustomer(id);
+    if (business.status !== "PENDING") throw new ApiError(409, "Only pending business profiles can be reviewed", "BUSINESS_STATUS_TRANSITION_INVALID");
+    const updated = await customerRepository.reviewBusiness(id, status);
+    logger.info({ event: status === "APPROVED" ? "crm.business_profile_approved" : "crm.business_profile_rejected", customerId: id, actorId }, "Business profile reviewed");
+    return updated;
+  },
   listCrmContacts: (id: string) => customerRepository.listContactsForCustomer(id),
   createCrmContact: (id: string, data: ContactInput) => customerRepository.createContact(id, data),
   async updateCrmContact(customerId: string, id: string, data: Prisma.CustomerContactUpdateManyMutationInput) { return requireRecord(await customerRepository.updateContact(customerId, id, data), "Contact not found", "CONTACT_NOT_FOUND"); },
