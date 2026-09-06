@@ -35,4 +35,22 @@ describe("runSeed", () => {
     expect(prisma.$disconnect).toHaveBeenCalledOnce();
     expect(prisma.product.upsert).toHaveBeenCalledTimes(11);
   });
+
+  it("can be run repeatedly without adding a second provisioning path", async () => {
+    await runSeed();
+    await runSeed();
+
+    expect(authService.seedDefaultAdmin).toHaveBeenCalledTimes(2);
+    expect(prisma.product.upsert).toHaveBeenCalledTimes(22);
+    expect(prisma.$disconnect).toHaveBeenCalledTimes(2);
+  });
+
+  it("disconnects Prisma when explicit provisioning fails", async () => {
+    vi.mocked(authService.seedDefaultAdmin).mockRejectedValue(new Error("seed failed"));
+
+    await expect(runSeed()).rejects.toThrow("seed failed");
+
+    expect(prisma.$disconnect).toHaveBeenCalledOnce();
+    expect(prisma.product.upsert).not.toHaveBeenCalled();
+  });
 });
