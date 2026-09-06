@@ -92,12 +92,29 @@ export const openApiDocument = {
     },
     "/api/v1/products": {
       get: {
-        summary: "List products with pagination and filters",
+        summary: "List published catalog products with pagination, category and SKU/name search",
       },
       post: {
         summary: "Create product",
         security: [{ bearerAuth: [] }],
       },
+    },
+    "/api/v1/products/admin/catalog": {
+      get: { summary: "List catalog products including internal statuses (ADMIN, SALES, VIEWER)", security: [{ bearerAuth: [] }] },
+    },
+    "/api/v1/categories": {
+      get: { summary: "List active product categories" },
+      post: { summary: "Create a product category (ADMIN only)", security: [{ bearerAuth: [] }] },
+    },
+    "/api/v1/pricing/products/{id}": {
+      get: { summary: "List internal price definitions (ADMIN, SALES, VIEWER)", security: [{ bearerAuth: [] }] },
+      post: { summary: "Create a price definition (ADMIN only)", description: "Rejects invalid date/quantity ranges and overlapping active price periods.", security: [{ bearerAuth: [] }] },
+    },
+    "/api/v1/pricing/products/{id}/resolve": {
+      get: { summary: "Resolve the active catalog price", description: "Uses authenticated customer identity for any override; no customer ID may be supplied by the caller." },
+    },
+    "/api/v1/pricing/{id}": {
+      patch: { summary: "Update or activate/deactivate a price definition (ADMIN only)", security: [{ bearerAuth: [] }] },
     },
     "/api/v1/blogs": {
       get: {

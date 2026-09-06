@@ -6,6 +6,10 @@ export const productController = {
     const result = await productService.list({ ...res.locals.validatedQuery, status: "PUBLISHED" } as never);
     res.status(200).json(result);
   },
+  listInternal: async (_req: Request, res: Response) => {
+    const result = await productService.list(res.locals.validatedQuery);
+    res.status(200).json(result);
+  },
 
   getById: async (req: Request, res: Response) => {
     const result = await productService.getPublishedById(req.params.id as string);

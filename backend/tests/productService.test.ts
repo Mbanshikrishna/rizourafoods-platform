@@ -16,7 +16,7 @@ const mockProduct = {
   name: "Heritage Basmati",
   slug: "heritage-basmati",
   description: "Aged for 2+ years",
-  shortDescription: null, subcategory: null, origin: null, ingredients: null, unit: null, packSizes: [], moq: null, availability: null, leadTimeDays: null, b2bEligible: true, badges: [], specifications: null, storageInstructions: null, usage: null,
+  shortDescription: null, categoryId: null, sku: null, brand: null, baseUnit: null, packSize: null, packUnit: null, hsnCode: null, subcategory: null, origin: null, ingredients: null, unit: null, packSizes: [], moq: null, availability: null, leadTimeDays: null, b2bEligible: true, badges: [], specifications: null, storageInstructions: null, usage: null,
   category: "basmati",
   imageUrl: null,
   status: "PUBLISHED" as const,

@@ -5,6 +5,8 @@ vi.mock("../src/prisma/client", () => ({
     $connect: vi.fn(),
     $disconnect: vi.fn(),
     product: { upsert: vi.fn() },
+    productCategory: { upsert: vi.fn() },
+    productPrice: { findFirst: vi.fn(), create: vi.fn() },
   },
 }));
 
@@ -24,7 +26,9 @@ describe("runSeed", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     vi.mocked(authService.seedDefaultAdmin).mockResolvedValue({ email: "admin@example.com" } as never);
-    vi.mocked(prisma.product.upsert).mockResolvedValue({} as never);
+    vi.mocked(prisma.productCategory.upsert).mockResolvedValue({ id: "category-seed", code: "RICE" } as never);
+    vi.mocked(prisma.product.upsert).mockResolvedValue({ id: "product-seed" } as never);
+    vi.mocked(prisma.productPrice.findFirst).mockResolvedValue({ id: "existing-price" } as never);
   });
 
   it("provisions the default admin through the explicit seed operation", async () => {
@@ -33,7 +37,8 @@ describe("runSeed", () => {
     expect(authService.seedDefaultAdmin).toHaveBeenCalledOnce();
     expect(prisma.$connect).toHaveBeenCalledOnce();
     expect(prisma.$disconnect).toHaveBeenCalledOnce();
-    expect(prisma.product.upsert).toHaveBeenCalledTimes(11);
+    expect(prisma.productCategory.upsert).toHaveBeenCalledTimes(7);
+    expect(prisma.product.upsert).toHaveBeenCalledTimes(14);
   });
 
   it("can be run repeatedly without adding a second provisioning path", async () => {
@@ -41,7 +46,7 @@ describe("runSeed", () => {
     await runSeed();
 
     expect(authService.seedDefaultAdmin).toHaveBeenCalledTimes(2);
-    expect(prisma.product.upsert).toHaveBeenCalledTimes(22);
+    expect(prisma.product.upsert).toHaveBeenCalledTimes(28);
     expect(prisma.$disconnect).toHaveBeenCalledTimes(2);
   });
 

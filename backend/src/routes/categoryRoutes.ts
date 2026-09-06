@@ -1,0 +1,11 @@
+import { Router } from "express";
+import { categoryController } from "../controllers/categoryController";
+import { requireAuth, requireRole } from "../middlewares/auth";
+import { asyncHandler } from "../utils/asyncHandler";
+import { validateRequest } from "../middlewares/validateRequest";
+import { createCategorySchema, listCategorySchema, updateCategorySchema } from "../validations/categoryValidation";
+const router = Router();
+router.get("/", validateRequest(listCategorySchema), asyncHandler(categoryController.list));
+router.post("/", requireAuth, requireRole("ADMIN"), validateRequest(createCategorySchema), asyncHandler(categoryController.create));
+router.patch("/:id", requireAuth, requireRole("ADMIN"), validateRequest(updateCategorySchema), asyncHandler(categoryController.update));
+export default router;

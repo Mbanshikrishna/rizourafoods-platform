@@ -18,6 +18,7 @@ const buildWhere = (filters: ProductListFilters): Prisma.ProductWhereInput => ({
           { name: { contains: filters.search, mode: "insensitive" } },
           { description: { contains: filters.search, mode: "insensitive" } },
           { slug: { contains: filters.search, mode: "insensitive" } },
+          { sku: { contains: filters.search, mode: "insensitive" } },
         ],
       }
     : {}),
@@ -49,12 +50,12 @@ export const productRepository = {
 
   findPublishedBySlug: (slug: string) => prisma.product.findFirst({ where: { slug, status: "PUBLISHED" } }),
 
-  create: (data: Prisma.ProductCreateInput) =>
+  create: (data: Prisma.ProductUncheckedCreateInput) =>
     prisma.product.create({
       data,
     }),
 
-  update: (id: string, data: Prisma.ProductUpdateInput) =>
+  update: (id: string, data: Prisma.ProductUncheckedUpdateInput) =>
     prisma.product.update({
       where: { id },
       data,
