@@ -2,11 +2,9 @@ import { app } from "./app";
 import { env } from "./config/env";
 import { logger } from "./config/logger";
 import { prisma } from "./prisma/client";
-import { authService } from "./services/authService";
 
-const startServer = async () => {
+export const startServer = async () => {
   await prisma.$connect();
-  await authService.seedDefaultAdmin();
 
   const server = app.listen(env.PORT, () => {
     logger.info(
@@ -35,8 +33,10 @@ const startServer = async () => {
   });
 };
 
-void startServer().catch(async (error) => {
-  logger.error({ err: error }, "Failed to start server");
-  await prisma.$disconnect();
-  process.exit(1);
-});
+if (require.main === module) {
+  void startServer().catch(async (error) => {
+    logger.error({ err: error }, "Failed to start server");
+    await prisma.$disconnect();
+    process.exit(1);
+  });
+}
