@@ -1,7 +1,6 @@
 import type { Request, Response } from "express";
 import { env } from "../config/env";
 import { customerService } from "../services/customerService";
-import { prisma } from "../prisma/client";
 import { ApiError } from "../utils/apiError";
 const cookie = (res: Response, token: string) => res.cookie(env.CUSTOMER_REFRESH_COOKIE_NAME, token, { httpOnly: true, sameSite: "strict", secure: env.NODE_ENV === "production", path: `${env.API_PREFIX}/customer-auth`, maxAge: 7 * 24 * 60 * 60 * 1000 });
 const result = (res: Response, data: { customer: unknown; tokens: { accessToken: string; refreshToken: string } }, status = 200) => { cookie(res, data.tokens.refreshToken); res.status(status).json({ data: { customer: data.customer, accessToken: data.tokens.accessToken } }); };
@@ -14,8 +13,12 @@ export const customerController = {
   updateMe: async (req: Request, res: Response) => res.json({ data: await customerService.update(req.customer!.customerId, req.body) }),
   business: async (req: Request, res: Response) => res.json({ data: await customerService.business(req.customer!.customerId) }),
   updateBusiness: async (req: Request, res: Response) => res.json({ data: await customerService.updateBusiness(req.customer!.customerId, req.body) }),
-  addresses: async (req: Request, res: Response) => res.json({ data: await prisma.address.findMany({ where: { customerId: req.customer!.customerId }, orderBy: { createdAt: "desc" } }) }),
-  addAddress: async (req: Request, res: Response) => res.status(201).json({ data: await prisma.address.create({ data: { ...req.body, customerId: req.customer!.customerId } }) }),
-  updateAddress: async (req: Request, res: Response) => { const id = req.params.id as string; const address = await prisma.address.updateMany({ where: { id, customerId: req.customer!.customerId }, data: req.body }); if (!address.count) throw new ApiError(404, "Address not found", "ADDRESS_NOT_FOUND"); res.json({ data: await prisma.address.findUnique({ where: { id } }) }); },
-  deleteAddress: async (req: Request, res: Response) => { const address = await prisma.address.deleteMany({ where: { id: req.params.id as string, customerId: req.customer!.customerId } }); if (!address.count) throw new ApiError(404, "Address not found", "ADDRESS_NOT_FOUND"); res.status(204).send(); },
+  addresses: async (req: Request, res: Response) => res.json({ data: await customerService.addresses(req.customer!.customerId) }),
+  addAddress: async (req: Request, res: Response) => res.status(201).json({ data: await customerService.addAddress(req.customer!.customerId, req.body) }),
+  updateAddress: async (req: Request, res: Response) => res.json({ data: await customerService.updateAddress(req.customer!.customerId, req.params.id as string, req.body) }),
+  deleteAddress: async (req: Request, res: Response) => { await customerService.deleteAddress(req.customer!.customerId, req.params.id as string); res.status(204).send(); },
+  contacts: async (req: Request, res: Response) => res.json({ data: await customerService.contacts(req.customer!.customerId) }),
+  addContact: async (req: Request, res: Response) => res.status(201).json({ data: await customerService.addContact(req.customer!.customerId, req.body) }),
+  updateContact: async (req: Request, res: Response) => res.json({ data: await customerService.updateContact(req.customer!.customerId, req.params.id as string, req.body) }),
+  deleteContact: async (req: Request, res: Response) => { await customerService.deleteContact(req.customer!.customerId, req.params.id as string); res.status(204).send(); },
 };
